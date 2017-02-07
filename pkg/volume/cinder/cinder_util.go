@@ -180,7 +180,13 @@ func probeAttachedVolume() error {
 
 	executor := exec.New()
 	args := []string{"trigger"}
-	cmd := executor.Command("/usr/bin/udevadm", args...)
+	udevadm, lookupErr := executor.LookPath("udevadm")
+	if lookupErr != nil {
+		glog.Errorf("%v\n", lookupErr)
+		return lookupErr
+	}
+
+	cmd := executor.Command(udevadm, args...)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
 		glog.Errorf("error running udevadm trigger %v\n", err)
